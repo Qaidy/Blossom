@@ -247,26 +247,27 @@
         >
 
         <!-- Desktop nav -->
+        <!-- Desktop nav -->
         <nav
-          class="hidden lg:flex items-center gap-8 text-[13px] font-medium uppercase tracking-widest"
+          class="hidden lg:flex items-center gap-8 h-full text-[13px] font-medium uppercase tracking-widest"
         >
           <a
             href="#/"
             class="hover:text-sage transition-colors duration-300 py-2"
             >Home</a
           >
-          <div class="group py-2">
+          <div class="group h-full flex items-center">
             <a
               href="#/shop"
               onclick="
                 navigateToShopCategory('All');
                 return false;
               "
-              class="hover:text-sage transition-colors duration-300 cursor-pointer"
+              class="hover:text-sage transition-colors duration-300 cursor-pointer py-2"
               >Collections ▾</a
             >
             <div
-              class="absolute left-1/2 -translate-x-1/2 top-full pt-2 w-[800px] max-w-[calc(100vw-2rem)] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-500"
+              class="absolute left-1/2 -translate-x-1/2 top-full pt-2 w-[800px] max-w-[calc(100vw-2rem)] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-300"
             >
               <div
                 id="mega"
@@ -288,7 +289,10 @@
         </nav>
 
         <!-- Right actions -->
-        <div id="header-actions" class="flex items-center gap-3 sm:gap-6 shrink-0">
+        <div
+          id="header-actions"
+          class="flex items-center gap-3 sm:gap-6 shrink-0"
+        >
           <!-- Desktop-only icons -->
           <a
             href="#/login"
@@ -355,8 +359,36 @@
             aria-controls="mobile-nav"
             onclick="toggleMobileNav()"
           >
-            <svg id="ic-open" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
-            <svg id="ic-close" class="w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+            <svg
+              id="ic-open"
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              />
+            </svg>
+            <svg
+              id="ic-close"
+              class="w-5 h-5 hidden"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18 18 6M6 6l12 12"
+              />
+            </svg>
           </button>
         </div>
 
@@ -366,7 +398,9 @@
           class="hidden lg:hidden absolute left-0 right-0 top-full z-50 bg-background border-b border-border shadow-bloom max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain"
           aria-label="Mobile navigation"
         >
-          <div class="px-6 py-4 bg-surface border-b border-border flex items-center gap-3">
+          <div
+            class="px-6 py-4 bg-surface border-b border-border flex items-center gap-3"
+          >
             <span class="text-sage" data-ic="user"></span>
             <div class="min-w-0">
               <p class="lbl">Welcome</p>
@@ -376,26 +410,67 @@
 
           <a href="#/" onclick="closeMobileNav()" class="mnav">Home</a>
 
-          <button type="button" onclick="toggleMobileCollections()" class="mnav" aria-expanded="false" id="m-coll-btn">
+          <button
+            type="button"
+            onclick="toggleMobileCollections()"
+            class="mnav"
+            aria-expanded="false"
+            id="m-coll-btn"
+          >
             <span>Collections</span>
-            <svg id="m-coll-arrow" class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+            <svg
+              id="m-coll-arrow"
+              class="w-4 h-4 transition-transform duration-300"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m19.5 8.25-7.5 7.5-7.5-7.5"
+              />
+            </svg>
           </button>
           <div id="m-coll" class="hidden bg-surface/60"></div>
 
           <a href="#/about" onclick="closeMobileNav()" class="mnav">About Us</a>
 
-          <a id="mobile-auth-link" href="#/login" onclick="closeMobileNav()" class="mnav">Sign In</a>
+          <a
+            id="mobile-auth-link"
+            href="#/login"
+            onclick="closeMobileNav()"
+            class="mnav"
+            >Sign In</a
+          >
 
           <a href="#/wishlist" onclick="closeMobileNav()" class="mnav">
-            <span>Wishlist</span><span id="m-wishlist-badge" class="hidden mbadge">0</span>
+            <span>Wishlist</span
+            ><span id="m-wishlist-badge" class="hidden mbadge">0</span>
           </a>
           <a href="#/cart" onclick="closeMobileNav()" class="mnav">
-            <span>Shopping Bag</span><span id="m-cart-badge" class="hidden mbadge">0</span>
+            <span>Shopping Bag</span
+            ><span id="m-cart-badge" class="hidden mbadge">0</span>
           </a>
 
-          <a id="mobile-admin-link" href="#/admin" onclick="closeMobileNav()" class="hidden mnav !bg-accent/40 font-semibold">Admin Panel</a>
+          <a
+            id="mobile-admin-link"
+            href="#/admin"
+            onclick="closeMobileNav()"
+            class="hidden mnav !bg-accent/40 font-semibold"
+            >Admin Panel</a
+          >
 
-          <button id="mobile-logout" type="button" onclick="closeMobileNav(); handleLogout()" class="hidden mnav !text-terra !border-b-0">
+          <button
+            id="mobile-logout"
+            type="button"
+            onclick="
+              closeMobileNav();
+              handleLogout();
+            "
+            class="hidden mnav !text-terra !border-b-0"
+          >
             <span>Sign Out</span>
           </button>
         </nav>
