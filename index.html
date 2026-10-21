@@ -76,6 +76,15 @@
         .h2 {
           @apply font-serif text-3xl md:text-4xl font-semibold;
         }
+        .mnav {
+          @apply flex items-center justify-between w-full px-6 py-4 border-b border-border text-[13px] font-medium uppercase tracking-widest text-left transition-colors hover:bg-surface;
+        }
+        .msub {
+          @apply block px-10 py-3 text-sm text-text-secondary normal-case tracking-normal border-b border-border/60 hover:text-primary hover:bg-surface text-left w-full;
+        }
+        .mbadge {
+          @apply bg-terra text-background text-[10px] min-w-[20px] h-5 px-1.5 rounded-full font-bold items-center justify-center;
+        }
       }
     </style>
     <style>
@@ -85,6 +94,7 @@
       body {
         background: #f9f8f4;
         color: #2d3a31;
+        overflow-x: hidden;
       }
       ::-webkit-scrollbar {
         width: 5px;
@@ -143,6 +153,51 @@
         font-weight: 400;
         color: #8c9a84;
       }
+      #mobile-nav {
+        animation: navIn 0.25s ease-out;
+      }
+      @keyframes navIn {
+        from {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @media (max-width: 639px) {
+        .sec {
+          padding: 3rem 1rem;
+        }
+        #app h1 {
+          font-size: clamp(2rem, 9vw, 3rem);
+        }
+        #app h2.h2,
+        #app h3.h2 {
+          font-size: clamp(1.65rem, 7vw, 2.25rem);
+        }
+        #app .btn,
+        #app .btn-o {
+          padding-inline: 1.25rem;
+        }
+        #app .rounded-xl.p-8 {
+          padding: 1.25rem;
+        }
+        footer {
+          padding: 3rem 1rem;
+        }
+        footer .flex.gap-6 {
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 1rem;
+        }
+      }
+      @media (hover: none) {
+        .card .group > div {
+          opacity: 1;
+        }
+      }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   </head>
@@ -158,29 +213,42 @@
 
     <div
       id="toast-container"
-      class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"
+      class="fixed top-4 right-4 left-4 sm:left-auto z-[65] flex flex-col items-end gap-2 pointer-events-none"
     ></div>
 
     <div
-      class="bg-accent text-primary text-[11px] font-medium tracking-widest text-center py-2 px-4 uppercase flex flex-wrap justify-center gap-x-12 gap-y-1"
+      class="bg-accent text-primary text-[10px] sm:text-[11px] font-medium tracking-widest text-center py-2 px-4 uppercase flex flex-wrap justify-center gap-x-12 gap-y-1"
     >
       <span>Free shipping on orders over $75</span
-      ><span>Easy 30-day returns</span><span>New collection every week</span>
+      ><span class="hidden sm:inline">Easy 30-day returns</span
+      ><span class="hidden md:inline">New collection every week</span>
     </div>
 
+    <!-- Backdrop for mobile menu -->
+    <div
+      id="mobile-backdrop"
+      class="hidden fixed inset-0 z-30 bg-primary/30 backdrop-blur-[2px] lg:hidden"
+      onclick="closeMobileNav()"
+    ></div>
+
     <header
-      class="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border"
+      class="sticky top-0 z-40 bg-background/90 backdrop-blur-md border-b border-border"
     >
       <div
-        class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between"
+        id="header-inner"
+        class="relative max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3"
       >
         <a
           href="#/"
-          class="font-serif text-2xl font-semibold tracking-[0.3em] uppercase text-primary"
+          id="brand"
+          onclick="closeMobileNav()"
+          class="font-serif text-xl sm:text-2xl font-semibold tracking-[0.15em] sm:tracking-[0.3em] uppercase text-primary shrink-0"
           >Blossom<em class="text-terra">.</em></a
         >
+
+        <!-- Desktop nav -->
         <nav
-          class="hidden lg:flex items-center gap-8 text-[13px] font-medium uppercase tracking-widest relative"
+          class="hidden lg:flex items-center gap-8 text-[13px] font-medium uppercase tracking-widest"
         >
           <a
             href="#/"
@@ -198,9 +266,13 @@
               >Collections ▾</a
             >
             <div
-              id="mega"
-              class="absolute left-1/2 -translate-x-1/2 top-full mt-1 w-[800px] bg-background border border-border p-8 rounded-lg shadow-bloom grid grid-cols-4 gap-8 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-500"
-            ></div>
+              class="absolute left-1/2 -translate-x-1/2 top-full pt-2 w-[800px] max-w-[calc(100vw-2rem)] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-500"
+            >
+              <div
+                id="mega"
+                class="bg-background border border-border p-8 rounded-lg shadow-bloom grid grid-cols-4 gap-8"
+              ></div>
+            </div>
           </div>
           <a
             href="#/about"
@@ -214,11 +286,14 @@
             >Admin Panel</a
           >
         </nav>
-        <div class="flex items-center gap-6">
+
+        <!-- Right actions -->
+        <div id="header-actions" class="flex items-center gap-3 sm:gap-6 shrink-0">
+          <!-- Desktop-only icons -->
           <a
             href="#/login"
             id="auth-btn"
-            class="hover:text-sage transition-colors relative group"
+            class="hidden lg:block hover:text-sage transition-colors relative group"
             title="Account"
             ><span data-ic="user"></span>
             <span
@@ -237,7 +312,7 @@
           </button>
           <a
             href="#/wishlist"
-            class="hover:text-sage transition-colors relative"
+            class="hidden lg:block hover:text-sage transition-colors relative"
             title="Wishlist"
             ><span data-ic="heart"></span>
             <span
@@ -248,7 +323,7 @@
           >
           <a
             href="#/cart"
-            class="hover:text-sage transition-colors relative"
+            class="hidden lg:block hover:text-sage transition-colors relative"
             title="Cart"
             ><span data-ic="bag"></span>
             <span
@@ -257,7 +332,73 @@
               >0</span
             ></a
           >
+
+          <!-- Mobile: quick cart + hamburger -->
+          <a
+            href="#/cart"
+            onclick="closeMobileNav()"
+            class="lg:hidden relative inline-flex items-center justify-center w-10 h-10 rounded-full border border-border text-primary"
+            aria-label="Shopping bag"
+            ><span data-ic="bag"></span>
+            <span
+              id="cart-badge-m"
+              class="hidden absolute -top-1 -right-1 bg-terra text-background text-[9px] w-4 h-4 rounded-full font-bold items-center justify-center"
+              >0</span
+            ></a
+          >
+          <button
+            id="mobile-menu-toggle"
+            type="button"
+            class="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-full border border-border text-primary"
+            aria-label="Open navigation menu"
+            aria-expanded="false"
+            aria-controls="mobile-nav"
+            onclick="toggleMobileNav()"
+          >
+            <svg id="ic-open" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+            <svg id="ic-close" class="w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+          </button>
         </div>
+
+        <!-- Mobile menu panel (all navbar items live here) -->
+        <nav
+          id="mobile-nav"
+          class="hidden lg:hidden absolute left-0 right-0 top-full z-50 bg-background border-b border-border shadow-bloom max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain"
+          aria-label="Mobile navigation"
+        >
+          <div class="px-6 py-4 bg-surface border-b border-border flex items-center gap-3">
+            <span class="text-sage" data-ic="user"></span>
+            <div class="min-w-0">
+              <p class="lbl">Welcome</p>
+              <p id="m-user" class="font-serif font-semibold truncate">Guest</p>
+            </div>
+          </div>
+
+          <a href="#/" onclick="closeMobileNav()" class="mnav">Home</a>
+
+          <button type="button" onclick="toggleMobileCollections()" class="mnav" aria-expanded="false" id="m-coll-btn">
+            <span>Collections</span>
+            <svg id="m-coll-arrow" class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
+          </button>
+          <div id="m-coll" class="hidden bg-surface/60"></div>
+
+          <a href="#/about" onclick="closeMobileNav()" class="mnav">About Us</a>
+
+          <a id="mobile-auth-link" href="#/login" onclick="closeMobileNav()" class="mnav">Sign In</a>
+
+          <a href="#/wishlist" onclick="closeMobileNav()" class="mnav">
+            <span>Wishlist</span><span id="m-wishlist-badge" class="hidden mbadge">0</span>
+          </a>
+          <a href="#/cart" onclick="closeMobileNav()" class="mnav">
+            <span>Shopping Bag</span><span id="m-cart-badge" class="hidden mbadge">0</span>
+          </a>
+
+          <a id="mobile-admin-link" href="#/admin" onclick="closeMobileNav()" class="hidden mnav !bg-accent/40 font-semibold">Admin Panel</a>
+
+          <button id="mobile-logout" type="button" onclick="closeMobileNav(); handleLogout()" class="hidden mnav !text-terra !border-b-0">
+            <span>Sign Out</span>
+          </button>
+        </nav>
       </div>
     </header>
 
@@ -266,10 +407,10 @@
     <footer class="border-t border-border py-20 px-6">
       <div
         id="footer-cols"
-        class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10"
+        class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-10"
       ></div>
       <div
-        class="max-w-7xl mx-auto border-t border-border mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-text-secondary"
+        class="max-w-7xl mx-auto border-t border-border mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-text-secondary text-center"
       >
         <span>&copy; 2026 Blossom Fashion. All rights reserved.</span>
         <div class="flex gap-6">
@@ -330,6 +471,42 @@
       };
       const ic = (k, c = "w-[22px] h-[22px]") =>
         `<svg class="${c}" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="${P[k]}"/></svg>`;
+
+      /* ---------- MOBILE NAV ---------- */
+      function setNavOpen(open) {
+        $("mobile-nav").classList.toggle("hidden", !open);
+        $("mobile-backdrop").classList.toggle("hidden", !open);
+        $("ic-open").classList.toggle("hidden", open);
+        $("ic-close").classList.toggle("hidden", !open);
+        $("mobile-menu-toggle").setAttribute("aria-expanded", String(open));
+        $("mobile-menu-toggle").setAttribute(
+          "aria-label",
+          open ? "Close navigation menu" : "Open navigation menu",
+        );
+        document.body.style.overflow = open ? "hidden" : "";
+      }
+      function closeMobileNav() {
+        setNavOpen(false);
+      }
+      function toggleMobileNav() {
+        setNavOpen($("mobile-nav").classList.contains("hidden"));
+      }
+      function toggleMobileCollections() {
+        const h = $("m-coll").classList.toggle("hidden");
+        $("m-coll-arrow").classList.toggle("rotate-180", !h);
+        $("m-coll-btn").setAttribute("aria-expanded", String(!h));
+      }
+      function mobileShopCat(c) {
+        closeMobileNav();
+        navigateToShopCategory(c);
+      }
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeMobileNav();
+      });
+      window.addEventListener("resize", () => {
+        if (window.innerWidth >= 1024) closeMobileNav();
+      });
+
       const empty = (msg, btn) =>
         `<div class="col-span-full py-20 text-center flex flex-col items-center"><p class="font-serif italic text-text-secondary">${msg}</p>${btn ? `<a href="${btn[0]}" class="btn mt-6">${btn[1]}</a>` : ""}</div>`;
 
@@ -337,6 +514,12 @@
       document
         .querySelectorAll("[data-ic]")
         .forEach((e) => (e.innerHTML = ic(e.dataset.ic)));
+      $("m-coll").innerHTML =
+        `<button type="button" onclick="mobileShopCat('All')" class="msub !text-primary font-semibold">All Products →</button>` +
+        CATS.map(
+          (k) =>
+            `<button type="button" onclick="mobileShopCat('${k}')" class="msub ${k === "Sale" ? "!text-terra font-semibold" : ""}">${k}</button>`,
+        ).join("");
       $("mega").innerHTML =
         [
           [
@@ -388,7 +571,7 @@
         ["Company", ["Our Story", "Careers", "Sustainability", "Blog"]],
       ];
       $("footer-cols").innerHTML =
-        `<div class="lg:col-span-2"><a href="#/" class="font-serif text-xl font-semibold tracking-[0.3em] uppercase block mb-4">Blossom<em class="text-terra">.</em></a><p class="text-text-secondary text-sm leading-relaxed max-w-sm mb-6">Timeless fashion for every woman, made to inspire confidence and elegance through high-quality materials and thoughtful cuts.</p><div class="flex gap-4 text-sm text-text-secondary"><a href="#/" class="hover:text-primary">Instagram</a><a href="#/" class="hover:text-primary">Pinterest</a><a href="#/" class="hover:text-primary">TikTok</a></div></div>` +
+        `<div class="sm:col-span-2 lg:col-span-2"><a href="#/" class="font-serif text-xl font-semibold tracking-[0.3em] uppercase block mb-4">Blossom<em class="text-terra">.</em></a><p class="text-text-secondary text-sm leading-relaxed max-w-sm mb-6">Timeless fashion for every woman, made to inspire confidence and elegance through high-quality materials and thoughtful cuts.</p><div class="flex flex-wrap gap-4 text-sm text-text-secondary"><a href="#/" class="hover:text-primary">Instagram</a><a href="#/" class="hover:text-primary">Pinterest</a><a href="#/" class="hover:text-primary">TikTok</a></div></div>` +
         FC.map(
           ([t, l], i) =>
             `<div><h5 class="text-xs font-semibold uppercase tracking-widest mb-4">${t}</h5><ul class="flex flex-col gap-2.5 text-sm text-text-secondary">${l.map((x) => `<li><a href="${i == 0 ? "#/shop" : "#/"}" class="hover:text-primary transition-colors">${x}</a></li>`).join("")}</ul></div>`,
@@ -398,7 +581,7 @@
       /* ---------- UTILS ---------- */
       function showToast(msg, type = "success") {
         const t = document.createElement("div");
-        t.className = `${type === "success" ? "bg-primary text-background" : "bg-terra text-white"} text-xs font-semibold tracking-wider uppercase py-3.5 px-6 rounded-full shadow-bloom transition-all duration-500 translate-y-2 opacity-0 flex items-center gap-3 pointer-events-auto`;
+        t.className = `${type === "success" ? "bg-primary text-background" : "bg-terra text-white"} text-xs font-semibold tracking-wider uppercase py-3.5 px-6 rounded-full shadow-bloom transition-all duration-500 translate-y-2 opacity-0 flex items-center gap-3 pointer-events-auto max-w-full`;
         t.innerHTML = `<span>${msg}</span><button class="font-bold opacity-75 hover:opacity-100">&times;</button>`;
         $("toast-container").appendChild(t);
         setTimeout(() => t.classList.remove("translate-y-2", "opacity-0"), 10);
@@ -427,28 +610,39 @@
       }
 
       function updateGlobalCounters() {
-        const setB = (el, n) => {
-          el.textContent = n;
-          el.classList.toggle("hidden", !n);
-          el.classList.toggle("flex", !!n);
-        };
+        const setB = (ids, n) =>
+          ids.forEach((id) => {
+            const el = $(id);
+            el.textContent = n;
+            el.classList.toggle("hidden", !n);
+            el.classList.toggle("flex", !!n);
+          });
+        const cartQty = cartItems.reduce((a, c) => a + c.quantity, 0);
         if (currentUser) {
-          $("user-display").textContent =
-            currentUser.user_metadata?.full_name || currentUser.email;
+          const nm = currentUser.user_metadata?.full_name || currentUser.email;
+          $("user-display").textContent = nm;
+          $("m-user").textContent = nm;
+          $("mobile-auth-link").textContent = "My Account";
+          $("mobile-auth-link").href = "#/profile";
           $("logout-btn").classList.remove("hidden");
+          $("logout-btn").classList.add("lg:block");
+          $("mobile-logout").classList.remove("hidden");
           $("auth-btn").href = "#/profile";
-          setB($("wishlist-badge"), wishlistItems.length);
-          setB(
-            $("cart-badge"),
-            cartItems.reduce((a, c) => a + c.quantity, 0),
-          );
+          setB(["wishlist-badge", "m-wishlist-badge"], wishlistItems.length);
+          setB(["cart-badge", "cart-badge-m", "m-cart-badge"], cartQty);
           $("nav-admin-link").classList.toggle("hidden", !isUserAdmin);
+          $("mobile-admin-link").classList.toggle("hidden", !isUserAdmin);
         } else {
           $("user-display").textContent = "Guest";
+          $("m-user").textContent = "Guest";
+          $("mobile-auth-link").textContent = "Sign In";
+          $("mobile-auth-link").href = "#/login";
           $("auth-btn").href = "#/login";
-          setB($("wishlist-badge"), 0);
-          setB($("cart-badge"), 0);
+          setB(["wishlist-badge", "m-wishlist-badge"], 0);
+          setB(["cart-badge", "cart-badge-m", "m-cart-badge"], 0);
           $("nav-admin-link").classList.add("hidden");
+          $("mobile-admin-link").classList.add("hidden");
+          $("mobile-logout").classList.add("hidden");
           $("logout-btn").classList.add("hidden");
         }
       }
@@ -532,6 +726,7 @@
         });
       }
       window.addEventListener("hashchange", () => {
+        closeMobileNav();
         window.scrollTo(0, 0);
         router();
       });
@@ -558,7 +753,7 @@
   </div>
   <div class="mt-4 mb-1 flex flex-col gap-1.5 text-left">
    <a href="#/product/${p.id}"><h4 class="font-serif font-semibold text-sm truncate hover:text-sage" title="${p.name}">${p.name}</h4></a>
-   <div class="flex items-center gap-2"><span class="text-sm font-semibold">$${p.price}</span>
+   <div class="flex flex-wrap items-center gap-x-2"><span class="text-sm font-semibold">$${p.price}</span>
    ${p.discount_percent > 0 ? `<span class="text-xs line-through text-text-secondary">$${p.original_price}</span><span class="text-[10px] text-terra font-semibold">-${p.discount_percent}%</span>` : ""}</div>
    <div class="text-rating text-xs">★★★★★ <span class="text-[10px] text-text-secondary">(120)</span></div>
   </div></div>`;
@@ -653,49 +848,48 @@
           ],
         ];
         c.innerHTML = `
- <section class="max-w-7xl mx-auto px-6 py-16 lg:py-28 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-  <div class="lg:col-span-6 flex flex-col gap-8 relative z-10">
+ <section class="max-w-7xl mx-auto px-4 sm:px-6 py-12 lg:py-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+  <div class="lg:col-span-6 flex flex-col gap-6 sm:gap-8 relative z-10">
    <span class="eyebrow">— New Season</span>
-   <h1 class="font-serif text-5xl md:text-7xl font-semibold leading-[1.05] lg:-mr-24">Style that <em>speaks</em> for you.</h1>
-   <p class="text-text-secondary text-lg leading-relaxed max-w-md">Timeless fashion made for every moment, every mood, and every <em class="font-serif">you</em>.</p>
-   <div class="flex flex-wrap gap-4"><a href="#/shop" class="btn !h-14 !px-10">Shop Now →</a><a href="#/shop" class="btn-o !h-14 !px-10">Explore</a></div>
+   <h1 class="font-serif text-4xl sm:text-5xl md:text-7xl font-semibold leading-[1.05] lg:-mr-24">Style that <em>speaks</em> for you.</h1>
+   <p class="text-text-secondary text-base sm:text-lg leading-relaxed max-w-md">Timeless fashion made for every moment, every mood, and every <em class="font-serif">you</em>.</p>
+   <div class="flex flex-wrap gap-3 sm:gap-4"><a href="#/shop" class="btn !h-14 !px-8 sm:!px-10">Shop Now →</a><a href="#/shop" class="btn-o !h-14 !px-8 sm:!px-10">Explore</a></div>
    <div class="flex items-center gap-4 mt-2"><div class="flex -space-x-3">${tests.map((t) => `<img class="h-9 w-9 rounded-full ring-2 ring-background object-cover" src="https://images.unsplash.com/photo-${t[1]}?q=80&w=150" alt="">`).join("")}</div><span class="text-xs text-text-secondary tracking-wide">Join 100,000+ happy customers</span></div>
   </div>
   <div class="lg:col-span-6 relative">
-   <div class="arch overflow-hidden aspect-[3/4] md:aspect-square md:h-[620px] w-full shadow-lg rotate-1 group"><img class="w-full h-full object-cover group-hover:scale-105 duration-700" src="https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?q=80&w=1000" alt="Blossom Spring Wear"></div>
-   <div class="absolute top-10 -right-2 bg-terra text-background w-24 h-24 rounded-full flex flex-col items-center justify-center
-    text-center uppercase leading-none shadow-soft"><span class="text-[9px] tracking-widest">Up to</span><span class="font-serif text-2xl italic">40%</span><span class="text-[9px] tracking-widest">Off</span></div>
-   <div class="absolute bottom-8 -left-4 bg-background/80 backdrop-blur-sm border border-border p-3 pr-6 rounded-full flex items-center gap-4 shadow-bloom"><img class="w-12 h-12 rounded-full object-cover" src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=150" alt=""><div><h4 class="font-serif font-semibold text-sm">Collection 2026</h4><p class="text-[11px] text-text-secondary italic">Minimal. Modern. You.</p></div></div>
+   <div class="arch overflow-hidden aspect-[4/5] sm:aspect-[3/4] md:aspect-square md:h-[620px] w-full shadow-lg rotate-1 group"><img class="w-full h-full object-cover group-hover:scale-105 duration-700" src="https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?q=80&w=1000" alt="Blossom Spring Wear"></div>
+   <div class="absolute top-6 sm:top-10 right-2 sm:-right-2 bg-terra text-background w-20 h-20 sm:w-24 sm:h-24 rounded-full flex flex-col items-center justify-center text-center uppercase leading-none shadow-soft"><span class="text-[9px] tracking-widest">Up to</span><span class="font-serif text-xl sm:text-2xl italic">40%</span><span class="text-[9px] tracking-widest">Off</span></div>
+   <div class="absolute bottom-6 sm:bottom-8 left-2 sm:-left-4 bg-background/80 backdrop-blur-sm border border-border p-2 sm:p-3 pr-4 sm:pr-6 rounded-full flex items-center gap-3 sm:gap-4 shadow-bloom"><img class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover" src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=150" alt=""><div><h4 class="font-serif font-semibold text-xs sm:text-sm">Collection 2026</h4><p class="text-[10px] sm:text-[11px] text-text-secondary italic">Minimal. Modern. You.</p></div></div>
   </div>
  </section>
 
- <section class="border-y border-border py-10 bg-surface"><div class="max-w-7xl mx-auto px-6 overflow-x-auto flex items-center justify-between gap-8 no-scrollbar">
-  ${CATS.map((k) => `<button onclick="navigateToShopCategory('${k}')" class="flex flex-col items-center gap-3 group shrink-0"><div class="w-14 h-14 rounded-full border border-border bg-background flex items-center justify-center group-hover:border-sage group-hover:-translate-y-1 transition-all duration-500"><span class="font-serif italic ${k === "Sale" ? "text-terra" : "text-primary"}">${k.slice(0, 2)}</span></div><span class="text-xs font-medium uppercase tracking-widest group-hover:text-sage transition-colors">${k}</span></button>`).join("")}
+ <section class="border-y border-border py-8 sm:py-10 bg-surface"><div class="max-w-7xl mx-auto px-4 sm:px-6 overflow-x-auto flex items-center justify-start lg:justify-between gap-6 sm:gap-8 no-scrollbar">
+  ${CATS.map((k) => `<button onclick="navigateToShopCategory('${k}')" class="flex flex-col items-center gap-3 group shrink-0"><div class="w-14 h-14 rounded-full border border-border bg-background flex items-center justify-center group-hover:border-sage group-hover:-translate-y-1 transition-all duration-500"><span class="font-serif italic ${k === "Sale" ? "text-terra" : "text-primary"}">${k.slice(0, 2)}</span></div><span class="text-[11px] sm:text-xs font-medium uppercase tracking-widest group-hover:text-sage transition-colors">${k}</span></button>`).join("")}
  </div></section>
 
- <section class="sec grid grid-cols-1 md:grid-cols-3 gap-8">
-  ${promos.map(([bg, tag, t, cat, cta, img]) => `<div class="${bg} border border-border p-8 rounded-xl flex justify-between items-center hover:-translate-y-1.5 hover:shadow-bloom transition-all duration-500"><div class="flex flex-col justify-between min-h-[150px]"><div><span class="eyebrow !text-[10px]">${tag}</span><h3 class="font-serif text-xl font-semibold leading-tight mt-2">${t}</h3></div>${cat ? `<button onclick="navigateToShopCategory('${cat}')" class="text-xs font-semibold underline mt-4 text-left">${cta} →</button>` : `<a href="#/login" class="text-xs font-semibold underline mt-4">${cta} →</a>`}</div><img class="w-24 h-32 object-cover rounded-t-full rounded-b-xl" src="https://images.unsplash.com/photo-${img}?q=80&w=200" alt=""></div>`).join("")}
+ <section class="sec grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+  ${promos.map(([bg, tag, t, cat, cta, img]) => `<div class="${bg} border border-border p-6 sm:p-8 rounded-xl flex justify-between items-center gap-4 hover:-translate-y-1.5 hover:shadow-bloom transition-all duration-500"><div class="flex flex-col justify-between min-h-[150px]"><div><span class="eyebrow !text-[10px]">${tag}</span><h3 class="font-serif text-xl font-semibold leading-tight mt-2">${t}</h3></div>${cat ? `<button onclick="navigateToShopCategory('${cat}')" class="text-xs font-semibold underline mt-4 text-left">${cta} →</button>` : `<a href="#/login" class="text-xs font-semibold underline mt-4">${cta} →</a>`}</div><img class="w-24 h-32 object-cover rounded-t-full rounded-b-xl shrink-0" src="https://images.unsplash.com/photo-${img}?q=80&w=200" alt=""></div>`).join("")}
  </section>
 
  <section class="sec !pt-0">
-  <div class="flex items-end justify-between mb-12"><div><h2 class="h2">Our <em>Best</em> Sellers</h2><p class="text-sm text-text-secondary mt-2">Our most coveted pieces chosen by style connoisseurs.</p></div><a href="#/shop" class="text-xs font-semibold text-text-secondary hover:text-sage uppercase tracking-widest transition-colors">View All →</a></div>
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">${best.length ? best.map(renderProductCard).join("") : empty("No products found. Add some products in the admin panel!")}</div>
+  <div class="flex flex-wrap items-end justify-between gap-3 mb-8 sm:mb-12"><div><h2 class="h2">Our <em>Best</em> Sellers</h2><p class="text-sm text-text-secondary mt-2">Our most coveted pieces chosen by style connoisseurs.</p></div><a href="#/shop" class="text-xs font-semibold text-text-secondary hover:text-sage uppercase tracking-widest transition-colors">View All →</a></div>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-8">${best.length ? best.map(renderProductCard).join("") : empty("No products found. Add some products in the admin panel!")}</div>
  </section>
 
- <section class="bg-surface border-y border-border py-16 px-6"><div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
+ <section class="bg-surface border-y border-border py-12 sm:py-16 px-6"><div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10">
   ${vals.map(([i, t, d]) => `<div class="flex items-start gap-4"><div class="p-3 bg-accent/40 text-primary rounded-full shrink-0">${ic(i, "w-5 h-5")}</div><div><h4 class="text-xs font-semibold uppercase tracking-widest">${t}</h4><p class="text-text-secondary text-sm mt-1">${d}</p></div></div>`).join("")}
  </div></section>
 
  <section class="sec">
-  <h2 class="h2 mb-12 text-center">What Our <em>Customers</em> Say</h2>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-  ${tests.map(([n, i, q], k) => `<div class="bg-white border border-border p-8 rounded-xl flex flex-col justify-between min-h-[240px] shadow-soft ${k === 1 ? "md:translate-y-8" : ""}"><p class="font-serif italic text-text-secondary leading-relaxed">"${q}"</p><div class="flex items-center gap-4 border-t border-border pt-4 mt-6"><img class="w-10 h-10 rounded-full object-cover" src="https://images.unsplash.com/photo-${i}?q=80&w=100" alt="${n}"><div><h5 class="text-xs font-semibold uppercase tracking-widest">${n}</h5><span class="text-[10px] text-text-secondary">Verified Buyer</span></div></div></div>`).join("")}
+  <h2 class="h2 mb-10 sm:mb-12 text-center">What Our <em>Customers</em> Say</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+  ${tests.map(([n, i, q], k) => `<div class="bg-white border border-border p-6 sm:p-8 rounded-xl flex flex-col justify-between min-h-[220px] shadow-soft ${k === 1 ? "md:translate-y-8" : ""}"><p class="font-serif italic text-text-secondary leading-relaxed">"${q}"</p><div class="flex items-center gap-4 border-t border-border pt-4 mt-6"><img class="w-10 h-10 rounded-full object-cover" src="https://images.unsplash.com/photo-${i}?q=80&w=100" alt="${n}"><div><h5 class="text-xs font-semibold uppercase tracking-widest">${n}</h5><span class="text-[10px] text-text-secondary">Verified Buyer</span></div></div></div>`).join("")}
   </div>
  </section>
 
- <section class="max-w-7xl mx-auto px-6 mb-24 mt-8"><div class="bg-accent/50 border border-border rounded-xl p-8 md:p-14 flex flex-col lg:flex-row items-center justify-between gap-8">
-  <div><h3 class="h2">Join the Blossom <em>Community</em></h3><p class="text-sm text-text-secondary mt-2">Subscribe now and get 10% off your first order!</p></div>
-  <div class="flex w-full lg:w-auto items-center gap-2 max-w-md"><input type="email" placeholder="Enter your email address" class="inp lg:w-72 !bg-background"><button onclick="showToast('Thank you for subscribing!')" class="btn shrink-0">Subscribe</button></div>
+ <section class="max-w-7xl mx-auto px-4 sm:px-6 mb-16 sm:mb-24 mt-8"><div class="bg-accent/50 border border-border rounded-xl p-6 sm:p-8 md:p-14 flex flex-col lg:flex-row items-center justify-between gap-6 sm:gap-8">
+  <div class="text-center lg:text-left"><h3 class="h2">Join the Blossom <em>Community</em></h3><p class="text-sm text-text-secondary mt-2">Subscribe now and get 10% off your first order!</p></div>
+  <div class="flex w-full lg:w-auto flex-col sm:flex-row items-stretch gap-2 max-w-md"><input type="email" placeholder="Enter your email address" class="inp lg:w-72 !bg-background"><button onclick="showToast('Thank you for subscribing!')" class="btn shrink-0">Subscribe</button></div>
  </div></section>`;
       }
 
@@ -704,11 +898,11 @@
         await loadProducts();
         const f = filterProducts();
         c.innerHTML = `<section class="sec">
-  <div class="mb-12 text-center"><h1 class="font-serif text-5xl md:text-6xl font-semibold">The <em>Collection</em></h1><p class="text-sm text-text-secondary mt-3 max-w-md mx-auto">Discover Blossom's carefully curated, timeless minimalist pieces designed for daily luxury.</p></div>
-  <div class="flex flex-col lg:flex-row gap-4 justify-between items-center border-b border-border pb-6 mb-8">
+  <div class="mb-8 sm:mb-12 text-center"><h1 class="font-serif text-4xl sm:text-5xl md:text-6xl font-semibold">The <em>Collection</em></h1><p class="text-sm text-text-secondary mt-3 max-w-md mx-auto">Discover Blossom's carefully curated, timeless minimalist pieces designed for daily luxury.</p></div>
+  <div class="flex flex-col lg:flex-row gap-4 lg:justify-between lg:items-center border-b border-border pb-6 mb-8">
    <div class="relative w-full lg:w-72"><input type="text" id="shop-search" value="${shopQ}" placeholder="Search..." class="inp !py-2.5 !pl-11"><div class="absolute left-4 top-3 text-text-secondary">${ic("search", "w-4 h-4")}</div></div>
-   <div class="flex items-center gap-2 overflow-x-auto no-scrollbar w-full lg:w-auto py-1">${["All", ...CATS].map((k) => `<button onclick="updateShopCategory('${k}')" class="border rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${shopCat === k ? "bg-primary text-background border-primary" : "border-border text-text-secondary hover:border-sage hover:text-primary"}">${k}</button>`).join("")}</div>
-   <div class="flex items-center gap-2 shrink-0"><label class="text-xs text-text-secondary">Sort</label><select onchange="updateShopSort(this.value)" class="border border-border bg-background text-xs font-semibold uppercase rounded-full px-4 py-2 outline-none focus:border-sage cursor-pointer">${[
+   <div class="flex items-center gap-2 overflow-x-auto no-scrollbar w-full lg:w-auto py-1">${["All", ...CATS].map((k) => `<button onclick="updateShopCategory('${k}')" class="border rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-all duration-300 whitespace-nowrap shrink-0 ${shopCat === k ? "bg-primary text-background border-primary" : "border-border text-text-secondary hover:border-sage hover:text-primary"}">${k}</button>`).join("")}</div>
+   <div class="flex items-center justify-between lg:justify-start gap-2 shrink-0"><label class="text-xs text-text-secondary">Sort</label><select onchange="updateShopSort(this.value)" class="border border-border bg-background text-xs font-semibold uppercase rounded-full px-4 py-2 outline-none focus:border-sage cursor-pointer max-w-[70%]">${[
      ["default", "Default"],
      ["low-high", "Price: Low to High"],
      ["high-low", "Price: High to Low"],
@@ -719,8 +913,8 @@
      )
      .join("")}</select></div>
   </div>
-  <div class="flex justify-between items-center mb-8 text-xs text-text-secondary uppercase tracking-widest"><span id="shop-count">Showing ${f.length} products</span>${shopQ || shopCat !== "All" ? `<button onclick="clearShopFilters()" class="text-terra font-bold underline">Clear Filters</button>` : ""}</div>
-  <div id="shop-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">${f.length ? f.map(renderProductCard).join("") : empty("No items matching current filters found.")}</div>
+  <div class="flex justify-between items-center mb-6 sm:mb-8 text-xs text-text-secondary uppercase tracking-widest"><span id="shop-count">Showing ${f.length} products</span>${shopQ || shopCat !== "All" ? `<button onclick="clearShopFilters()" class="text-terra font-bold underline">Clear Filters</button>` : ""}</div>
+  <div id="shop-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-8">${f.length ? f.map(renderProductCard).join("") : empty("No items matching current filters found.")}</div>
  </section>`;
         $("shop-search").addEventListener("input", (e) => {
           shopQ = e.target.value;
@@ -748,9 +942,9 @@
 
       /* ---------- AUTH ---------- */
       async function renderLogin(c) {
-        c.innerHTML = `<section class="max-w-md mx-auto px-6 py-24 flex flex-col gap-8">
+        c.innerHTML = `<section class="max-w-md mx-auto px-4 sm:px-6 py-16 sm:py-24 flex flex-col gap-8">
   <div class="text-center"><h2 class="h2">Welcome to <em>Blossom</em></h2><p class="eyebrow mt-2">Unveil Timeless Elegance</p></div>
-  <div class="border border-border p-8 rounded-xl bg-white shadow-soft flex flex-col gap-6">
+  <div class="border border-border p-6 sm:p-8 rounded-xl bg-white shadow-soft flex flex-col gap-6">
    <div class="flex border-b border-border"><button id="tab-signin" onclick="switchAuthTab('signin')" class="flex-1 text-xs font-bold uppercase tracking-widest text-primary border-b-2 border-primary pb-3">Sign In</button><button id="tab-signup" onclick="switchAuthTab('signup')" class="flex-1 text-xs font-bold uppercase tracking-widest text-text-secondary border-b-2 border-transparent pb-3">Sign Up</button></div>
    <form onsubmit="handleAuthSubmit(event)" class="flex flex-col gap-4">
     <div id="field-fullname" class="hidden flex-col gap-2"><label class="lbl">Full Name</label><input type="text" id="auth-name" placeholder="E.g., Jane Doe" class="inp"></div>
@@ -841,9 +1035,9 @@
             .single();
           if (!error && data) fn = data.full_name;
         } catch (e) {}
-        c.innerHTML = `<section class="max-w-md mx-auto px-6 py-24 flex flex-col gap-8">
+        c.innerHTML = `<section class="max-w-md mx-auto px-4 sm:px-6 py-16 sm:py-24 flex flex-col gap-8">
   <div class="text-center"><h2 class="h2">Account <em>Settings</em></h2><p class="eyebrow mt-2">Update Your Details</p></div>
-  <form onsubmit="handleProfileUpdate(event)" class="border border-border p-8 rounded-xl bg-white shadow-soft flex flex-col gap-4">
+  <form onsubmit="handleProfileUpdate(event)" class="border border-border p-6 sm:p-8 rounded-xl bg-white shadow-soft flex flex-col gap-4">
    <div class="flex flex-col gap-2"><label class="lbl">Full Name</label><input id="profile-name" required value="${fn}" class="inp"></div>
    <div class="flex flex-col gap-2"><label class="lbl">Email Address</label><input type="email" id="profile-email" required value="${currentUser.email}" class="inp"></div>
    <div class="flex flex-col gap-2"><label class="lbl">New Password</label><input type="password" id="profile-password" minlength="6" placeholder="Leave blank to keep current" class="inp"></div>
@@ -904,29 +1098,29 @@
           ],
         ];
         c.innerHTML = `<section class="sec">
-  <div class="mb-20 text-center"><span class="eyebrow">— Our Identity</span><h1 class="font-serif text-5xl md:text-6xl font-semibold mt-3">The Blossom <em>Story</em></h1><p class="text-sm text-text-secondary mt-4 max-w-md mx-auto leading-relaxed">Redefining modern luxury through sustainable materials, mindful craftsmanship, and timeless minimalist silhouettes.</p></div>
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center mb-24">
+  <div class="mb-14 sm:mb-20 text-center"><span class="eyebrow">— Our Identity</span><h1 class="font-serif text-4xl sm:text-5xl md:text-6xl font-semibold mt-3">The Blossom <em>Story</em></h1><p class="text-sm text-text-secondary mt-4 max-w-md mx-auto leading-relaxed">Redefining modern luxury through sustainable materials, mindful craftsmanship, and timeless minimalist silhouettes.</p></div>
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center mb-16 sm:mb-24">
    <div class="lg:col-span-6 flex flex-col gap-6"><h2 class="h2">Elegance in <em>Simplicity.</em></h2>
     <p class="text-text-secondary leading-relaxed">Founded in 2026, Blossom emerged from a simple desire: to create apparel that honors both the wearer and the earth. True luxury lies in restraint: clean cuts, organic textures, and pieces designed to endure beyond transient seasons.</p>
     <p class="text-text-secondary leading-relaxed">Each garment is built with certified organic linen, soft natural cotton blends, and responsibly sourced threads. Our local ateliers prioritize slow manufacturing, ensuring unparalleled drape and structural longevity.</p>
-    <div class="border-t border-border pt-6"><span class="font-serif italic text-xl">"Fashion is not about trends. It is about a permanent relationship with the garments we cherish."</span><span class="block text-[11px] font-semibold uppercase tracking-widest text-text-secondary mt-3">— Blossom Creative Director</span></div></div>
-   <div class="lg:col-span-6 relative"><div class="arch overflow-hidden shadow-lg -rotate-1"><img class="w-full h-[520px] object-cover hover:scale-105 duration-700" src="https://images.unsplash.com/photo-1509319117193-57bab727e09d?q=80&w=1000" alt="Blossom Philosophy"></div>
+    <div class="border-t border-border pt-6"><span class="font-serif italic text-lg sm:text-xl">"Fashion is not about trends. It is about a permanent relationship with the garments we cherish."</span><span class="block text-[11px] font-semibold uppercase tracking-widest text-text-secondary mt-3">— Blossom Creative Director</span></div></div>
+   <div class="lg:col-span-6 relative"><div class="arch overflow-hidden shadow-lg -rotate-1"><img class="w-full h-[320px] sm:h-[420px] lg:h-[520px] object-cover hover:scale-105 duration-700" src="https://images.unsplash.com/photo-1509319117193-57bab727e09d?q=80&w=1000" alt="Blossom Philosophy"></div>
     <div class="absolute bottom-8 -left-6 bg-accent py-4 px-6 rounded-xl shadow-bloom hidden sm:block"><span class="font-serif text-lg font-semibold block">100% Organic</span><span class="text-[10px] uppercase tracking-widest text-text-secondary">Certified Sustainable Materials</span></div></div>
   </div>
-  <div class="border-t border-border pt-20"><h3 class="h2 text-center mb-14">Our Core <em>Commitments</em></h3>
-   <div class="stagger grid grid-cols-1 md:grid-cols-3 gap-12">${vals.map(([a, b, d]) => `<div class="flex flex-col gap-3 bg-white border border-border rounded-xl p-8 shadow-soft"><span class="eyebrow !text-[11px]">${a}</span><h4 class="font-serif font-semibold text-xl">${b}</h4><p class="text-text-secondary text-sm leading-relaxed">${d}</p></div>`).join("")}</div></div>
+  <div class="border-t border-border pt-14 sm:pt-20"><h3 class="h2 text-center mb-10 sm:mb-14">Our Core <em>Commitments</em></h3>
+   <div class="stagger grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12">${vals.map(([a, b, d]) => `<div class="flex flex-col gap-3 bg-white border border-border rounded-xl p-6 sm:p-8 shadow-soft"><span class="eyebrow !text-[11px]">${a}</span><h4 class="font-serif font-semibold text-xl">${b}</h4><p class="text-text-secondary text-sm leading-relaxed">${d}</p></div>`).join("")}</div></div>
  </section>`;
       }
 
       /* ---------- WISHLIST ---------- */
       async function renderWishlist(c) {
-        c.innerHTML = `<section class="sec"><div class="mb-12 border-b border-border pb-6"><h2 class="h2">Your <em>Wishlist</em></h2><p class="text-sm text-text-secondary mt-2">Keep track of Blossom styles that caught your eye.</p></div>
- <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">${
+        c.innerHTML = `<section class="sec"><div class="mb-8 sm:mb-12 border-b border-border pb-6"><h2 class="h2">Your <em>Wishlist</em></h2><p class="text-sm text-text-secondary mt-2">Keep track of Blossom styles that caught your eye.</p></div>
+ <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-8">${
    wishlistItems.length
      ? wishlistItems
          .map((i) => {
            const p = i.products;
-           return `<div class="card"><div class="relative overflow-hidden rounded-none"><img class="w-full aspect-square object-cover" src="${p.image_url}" alt="${p.name}" onerror="${FALLBACK}"><button onclick="toggleWishlist('${p.id}')" class="absolute top-3 right-3 bg-background p-2 rounded-none shadow-soft text-terra" title="Remove">${ic("trash", "w-4 h-4")}</button></div><div class="mt-5 flex flex-col gap-2 text-center"><h4 class="font-serif font-semibold text-sm truncate">${p.name}</h4><span class="text-sm font-semibold">$${p.price}</span><button onclick="addToCart('${p.id}')" class="btn !h-10 !text-[10px] mt-1">Add to Cart</button></div></div>`;
+           return `<div class="card"><div class="relative overflow-hidden rounded-none"><img class="w-full aspect-square object-cover" src="${p.image_url}" alt="${p.name}" onerror="${FALLBACK}"><button onclick="toggleWishlist('${p.id}')" class="absolute top-3 right-3 bg-background p-2 rounded-none shadow-soft text-terra" title="Remove">${ic("trash", "w-4 h-4")}</button></div><div class="mt-5 flex flex-col gap-2 text-center"><h4 class="font-serif font-semibold text-sm truncate">${p.name}</h4><span class="text-sm font-semibold">$${p.price}</span><button onclick="addToCart('${p.id}')" class="btn !h-10 !text-[10px] !px-4 mt-1">Add to Cart</button></div></div>`;
          })
          .join("")
      : empty("Your wishlist is currently empty.", ["#/shop", "Explore Items"])
@@ -940,16 +1134,16 @@
             0,
           ),
           ship = sub >= 75 || !sub ? 0 : 10;
-        c.innerHTML = `<section class="sec grid grid-cols-1 lg:grid-cols-12 gap-12">
+        c.innerHTML = `<section class="sec grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12">
   <div class="lg:col-span-8"><div class="mb-8 border-b border-border pb-6"><h2 class="h2">Your Shopping <em>Cart</em></h2><p class="text-sm text-text-secondary mt-2">Review your selections before finalizing.</p></div>
   <div class="flex flex-col gap-6">${
     cartItems.length
       ? cartItems
           .map((i) => {
             const p = i.products;
-            return `<div class="bg-white border border-border rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-soft">
-   <div class="flex items-center gap-4 w-full sm:w-auto"><img class="w-20 h-24 rounded-t-full rounded-b-lg object-cover shrink-0" src="${p.image_url}" alt="${p.name}" onerror="${FALLBACK}"><div><h4 class="font-serif font-semibold text-primary">${p.name}</h4><span class="text-xs text-text-secondary">${p.category}</span></div></div>
-   <div class="flex items-center justify-between sm:justify-end gap-10 w-full sm:w-auto">
+            return `<div class="bg-white border border-border rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 shadow-soft">
+   <div class="flex items-center gap-4 w-full sm:w-auto"><img class="w-20 h-24 rounded-t-full rounded-b-lg object-cover shrink-0" src="${p.image_url}" alt="${p.name}" onerror="${FALLBACK}"><div class="min-w-0"><h4 class="font-serif font-semibold text-primary">${p.name}</h4><span class="text-xs text-text-secondary">${p.category}</span></div></div>
+   <div class="flex items-center justify-between sm:justify-end gap-4 sm:gap-10 w-full sm:w-auto">
     <div class="flex items-center border border-border rounded-full py-1 px-3"><button onclick="updateCartQty('${i.id}',${i.quantity - 1})" class="px-2 font-bold hover:text-terra">-</button><span class="text-sm font-semibold w-8 text-center">${i.quantity}</span><button onclick="updateCartQty('${i.id}',${i.quantity + 1})" class="px-2 font-bold hover:text-terra">+</button></div>
     <span class="font-semibold">$${(p.price * i.quantity).toFixed(2)}</span>
     <button onclick="deleteCartItem('${i.id}')" class="text-text-secondary hover:text-terra transition-colors" title="Remove">${ic("trash", "w-4 h-4")}</button>
@@ -961,7 +1155,7 @@
           "Start Shopping",
         ])
   }</div></div>
-  <div class="lg:col-span-4"><div class="border border-border p-8 rounded-xl bg-surface flex flex-col gap-6 lg:sticky lg:top-28">
+  <div class="lg:col-span-4"><div class="border border-border p-6 sm:p-8 rounded-xl bg-surface flex flex-col gap-6 lg:sticky lg:top-28">
    <h3 class="font-serif text-xl font-semibold">Order <em>Summary</em></h3>
    <div class="flex flex-col gap-3 text-sm border-b border-border pb-4"><div class="flex justify-between"><span class="text-text-secondary">Subtotal</span><span class="font-semibold">$${sub.toFixed(2)}</span></div><div class="flex justify-between"><span class="text-text-secondary">Shipping</span><span class="font-semibold text-success">${ship ? "$10.00" : "FREE"}</span></div></div>
    <div class="flex justify-between items-center"><span class="font-serif font-semibold">Total Due</span><span class="text-xl font-semibold">$${(sub + ship).toFixed(2)}</span></div>
@@ -973,11 +1167,11 @@
       async function renderAdmin(c) {
         await loadProducts();
         const L = productsList;
-        c.innerHTML = `<section class="sec grid grid-cols-1 lg:grid-cols-12 gap-12">
-  <div class="lg:col-span-8"><div class="mb-8 border-b border-border pb-6"><h2 class="h2">Admin <em>Control</em> Panel</h2><p class="text-sm text-text-secondary mt-2">Add, update, and manage the Blossom catalog.</p></div>
-   <div class="overflow-x-auto border border-border rounded-xl bg-white"><table class="w-full text-left text-sm"><thead class="bg-surface uppercase tracking-widest text-[10px] text-text-secondary font-bold"><tr>${["Item", "Category", "Price ($)", "Discount", "Best Seller", "Action"].map((h, i) => `<th class="p-4 ${i == 5 ? "text-right" : ""}">${h}</th>`).join("")}</tr></thead>
+        c.innerHTML = `<section class="sec grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12">
+  <div class="lg:col-span-8 min-w-0"><div class="mb-8 border-b border-border pb-6"><h2 class="h2">Admin <em>Control</em> Panel</h2><p class="text-sm text-text-secondary mt-2">Add, update, and manage the Blossom catalog.</p></div>
+   <div class="overflow-x-auto border border-border rounded-xl bg-white"><table class="w-full min-w-[560px] text-left text-sm"><thead class="bg-surface uppercase tracking-widest text-[10px] text-text-secondary font-bold"><tr>${["Item", "Category", "Price ($)", "Discount", "Best Seller", "Action"].map((h, i) => `<th class="p-4 ${i == 5 ? "text-right" : ""}">${h}</th>`).join("")}</tr></thead>
    <tbody class="divide-y divide-border">${L.length ? L.map((p) => `<tr class="hover:bg-surface/50"><td class="p-4 flex items-center gap-3 font-semibold"><img class="w-10 h-10 rounded-full object-cover shrink-0" src="${p.image_url}" alt="" onerror="${FALLBACK}"><span class="truncate max-w-[150px]">${p.name}</span></td><td class="p-4">${p.category}</td><td class="p-4 font-semibold">$${p.price}</td><td class="p-4">${p.discount_percent}%</td><td class="p-4">${p.is_best_seller ? '<span class="bg-accent text-primary font-semibold px-2 py-0.5 rounded-full text-[10px]">YES</span>' : "No"}</td><td class="p-4 text-right"><button onclick="deleteProduct('${p.id}')" class="text-terra hover:underline">Delete</button></td></tr>`).join("") : `<tr><td colspan="6" class="p-8 text-center text-text-secondary italic">No products currently listed.</td></tr>`}</tbody></table></div></div>
-  <div class="lg:col-span-4"><form onsubmit="handleAddProduct(event)" class="border border-border p-8 rounded-xl bg-surface flex flex-col gap-4">
+  <div class="lg:col-span-4"><form onsubmit="handleAddProduct(event)" class="border border-border p-6 sm:p-8 rounded-xl bg-surface flex flex-col gap-4">
    <h3 class="font-serif text-xl font-semibold">Add New <em>Product</em></h3>
    <div class="flex flex-col gap-1.5"><label class="lbl">Product Name</label><input id="p-name" required placeholder="Silk Slip Dress" class="inp !bg-background"></div>
    <div class="flex flex-col gap-1.5"><label class="lbl">Category</label><select id="p-category" class="inp !bg-background">${CATS.map((k) => `<option>${k}</option>`).join("")}</select></div>
@@ -998,20 +1192,20 @@
             .single();
           if (error || !p) throw new Error("Product not found or unavailable");
           const liked = wishlistItems.some((i) => i.product_id === p.id);
-          c.innerHTML = `<div class="max-w-7xl mx-auto px-6 pt-8 text-xs tracking-widest text-text-secondary uppercase"><a href="#/" class="hover:text-primary">Home</a><span class="mx-2">/</span><a href="#/shop" onclick="navigateToShopCategory('${p.category}')" class="hover:text-primary">${p.category}</a><span class="mx-2">/</span><span class="text-primary font-medium">${p.name}</span></div>
-  <section class="sec !pt-10 grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-16">
-   <div class="md:col-span-6 relative"><div class="arch overflow-hidden shadow-lg"><img class="w-full h-[600px] object-cover hover:scale-105 duration-700" src="${p.image_url}" alt="${p.name}" onerror="${FALLBACK}"></div>
-    ${p.discount_percent > 0 ? `<div class="absolute top-10 right-2 bg-terra text-background w-24 h-24 rounded-full flex flex-col items-center justify-center text-center uppercase leading-none"><span class="text-[9px] tracking-widest">Save</span><span class="font-serif text-2xl italic">${p.discount_percent}%</span><span class="text-[9px] tracking-widest">Off</span></div>` : ""}</div>
+          c.innerHTML = `<div class="max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 text-[11px] sm:text-xs tracking-widest text-text-secondary uppercase flex flex-wrap items-center gap-y-1"><a href="#/" class="hover:text-primary">Home</a><span class="mx-2">/</span><a href="#/shop" onclick="navigateToShopCategory('${p.category}')" class="hover:text-primary">${p.category}</a><span class="mx-2">/</span><span class="text-primary font-medium">${p.name}</span></div>
+  <section class="sec !pt-8 sm:!pt-10 grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16">
+   <div class="md:col-span-6 relative"><div class="arch overflow-hidden shadow-lg"><img class="w-full h-[380px] sm:h-[480px] md:h-[600px] object-cover hover:scale-105 duration-700" src="${p.image_url}" alt="${p.name}" onerror="${FALLBACK}"></div>
+    ${p.discount_percent > 0 ? `<div class="absolute top-8 sm:top-10 right-2 bg-terra text-background w-20 h-20 sm:w-24 sm:h-24 rounded-full flex flex-col items-center justify-center text-center uppercase leading-none"><span class="text-[9px] tracking-widest">Save</span><span class="font-serif text-xl sm:text-2xl italic">${p.discount_percent}%</span><span class="text-[9px] tracking-widest">Off</span></div>` : ""}</div>
    <div class="md:col-span-6 flex flex-col gap-8">
     <div class="flex flex-col gap-4"><span class="eyebrow">— ${p.category} Exclusive</span>
-     <h1 class="font-serif text-4xl md:text-5xl font-semibold leading-tight">${p.name}</h1>
+     <h1 class="font-serif text-3xl sm:text-4xl md:text-5xl font-semibold leading-tight">${p.name}</h1>
      <div class="flex items-center gap-2 text-rating">★★★★★ <span class="text-xs text-text-secondary">(142 Customer Reviews)</span></div>
-     <div class="flex items-baseline gap-4"><span class="text-3xl font-semibold">$${p.price}</span>${p.discount_percent > 0 ? `<span class="text-lg line-through text-text-secondary">$${p.original_price}</span><span class="text-xs text-terra font-bold bg-terra/10 px-3 py-1 rounded-full">-${p.discount_percent}% Off</span>` : ""}</div>
+     <div class="flex flex-wrap items-baseline gap-3 sm:gap-4"><span class="text-3xl font-semibold">$${p.price}</span>${p.discount_percent > 0 ? `<span class="text-lg line-through text-text-secondary">$${p.original_price}</span><span class="text-xs text-terra font-bold bg-terra/10 px-3 py-1 rounded-full">-${p.discount_percent}% Off</span>` : ""}</div>
      <hr class="border-border">
      <p class="text-text-secondary leading-relaxed">${p.description || "Crafted with precision from breathable, high-grade lightweight materials. Designed to present premium drape and timeless versatility."}</p>
-     <div class="flex flex-col gap-3 mt-2"><span class="lbl">Select Size</span><div class="flex gap-3">${["XS", "S", "M", "L", "XL"].map((s) => `<button onclick="selectProductSize(this)" class="w-12 h-12 border border-border rounded-full text-xs font-bold hover:border-sage transition-all duration-300 active:scale-95">${s}</button>`).join("")}</div></div>
+     <div class="flex flex-col gap-3 mt-2"><span class="lbl">Select Size</span><div class="flex flex-wrap gap-3">${["XS", "S", "M", "L", "XL"].map((s) => `<button onclick="selectProductSize(this)" class="w-12 h-12 border border-border rounded-full text-xs font-bold hover:border-sage transition-all duration-300 active:scale-95">${s}</button>`).join("")}</div></div>
     </div>
-    <div class="flex flex-col gap-3"><div class="flex items-center gap-4"><button onclick="addToCart('${p.id}')" class="btn flex-1 !h-14">Add To Cart</button><button onclick="toggleWishlist('${p.id}')" class="border border-border hover:bg-surface w-14 h-14 flex items-center justify-center rounded-full transition-all active:scale-95" title="Save to Wishlist">${ic("heart", "w-5 h-5 " + (liked ? "fill-terra stroke-terra" : "stroke-primary"))}</button></div>
+    <div class="flex flex-col gap-3"><div class="flex items-center gap-3 sm:gap-4"><button onclick="addToCart('${p.id}')" class="btn flex-1 !h-14">Add To Cart</button><button onclick="toggleWishlist('${p.id}')" class="border border-border hover:bg-surface w-14 h-14 shrink-0 flex items-center justify-center rounded-full transition-all active:scale-95" title="Save to Wishlist">${ic("heart", "w-5 h-5 " + (liked ? "fill-terra stroke-terra" : "stroke-primary"))}</button></div>
      <a href="#/shop" class="text-center text-xs text-text-secondary font-semibold hover:text-primary py-2 uppercase tracking-widest">← Return to Shopping</a></div>
     <div class="border-t border-border">${[
       [
