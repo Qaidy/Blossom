@@ -4,7 +4,7 @@
 
 **Premium Fashion**
 
-*Menggabungkan estetika editorial majalah fashion dengan fungsionalitas aplikasi web full-stack real-time*
+*Combining editorial magazine aesthetics with the power of a real-time full-stack web application*
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
@@ -16,64 +16,64 @@
 
 ---
 
-## Tentang Proyek
+## About the Project
 
-**Blossom** adalah platform e-commerce storefront premium dengan tema editorial minimalis modern. Terinspirasi dari estetika butik mewah internasional seperti Zara, Mango, dan Vogue — Blossom mengutamakan *generous whitespace*, tipografi kontras tinggi antara Serif editorial dan Sans-serif geometris, serta tampilan flat yang bersih tanpa drop-shadow berlebihan.
+**Blossom** is a premium e-commerce storefront platform with a modern editorial minimalism aesthetic. Inspired by the luxury boutique visuals of brands such as Zara, Mango, and Vogue, Blossom emphasizes generous whitespace, high-contrast typography blending editorial serif with geometric sans-serif, and a clean flat UI without excessive drop shadows.
 
-Backend-nya ditenagai oleh **Supabase** sebagai sistem database dan autentikasi real-time, menjadikan setiap perubahan data langsung terefleksi di seluruh antarmuka tanpa perlu reload halaman.
+Its backend is powered by **Supabase** as the database and real-time authentication system, allowing data changes to be reflected instantly across the interface without requiring a page reload.
 
 ---
 
-## ✨ Fitur Utama
+## ✨ Key Features
 
-### 🛒 Customer Portal (Sisi Pembeli)
+### 🛒 Customer Portal
 
-- **Single-Page Hash Routing** — Navigasi instan tanpa refresh halaman (`#/`, `#/shop`, `#/product/:id`, `#/wishlist`, `#/cart`, `#/profile`)
-- **Halaman Detail Produk (PDP)** — Layout split-screen asimetris dengan galeri visual besar, deskripsi bahan, panduan perawatan, dan pemilihan ukuran
-- **Keranjang Belanja Dinamis** — Manajemen kuantitas real-time, kalkulasi otomatis kupon, dan gratis ongkir untuk pembelian di atas $75
-- **Wishlist Persisten** — Tersimpan langsung ke database, tidak hilang meski browser ditutup
-- **Edit Profil Mandiri** — Perbarui nama, email, dan kata sandi langsung dari dasbor profil
+- **Single-Page Hash Routing** — Instant navigation without refreshing the page (`#/`, `#/shop`, `#/product/:id`, `#/wishlist`, `#/cart`, `#/profile`)
+- **Product Detail Page (PDP)** — Asymmetric split-screen layout with a large visual gallery, material description, care instructions, and size selection
+- **Dynamic Shopping Cart** — Real-time quantity management, automatic coupon calculation, and free shipping for purchases above $75
+- **Persistent Wishlist** — Stored directly in the database and retained even after the browser is closed
+- **Self-Service Profile Editing** — Update name, email, and password directly from the profile dashboard
 
-### 🛡️ Admin Dashboard (Sisi Pengelola)
+### 🛡️ Admin Dashboard
 
-- **Manajemen Produk (CRUD)** — Tambah koleksi baru lengkap dengan gambar, harga, diskon, kategori, dan penanda *Best Seller*
-- **Live Updates Real-Time** — Setiap perubahan di halaman admin (`#/admin`) langsung tercermin di katalog pembeli secara instan
-- **Custom Confirmation Modal** — Dialog konfirmasi elegan bertema Blossom, menggantikan dialog bawaan browser
+- **Product Management (CRUD)** — Add new collections with images, pricing, discounts, categories, and *Best Seller* labels
+- **Real-Time Live Updates** — Every change made on the admin page (`#/admin`) is reflected instantly in the customer catalog
+- **Custom Confirmation Modal** — Elegant Blossom-themed confirmation dialog that replaces the default browser dialog
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer | Teknologi |
+| Layer | Technology |
 |---|---|
 | **Frontend** | HTML5, JavaScript (ES6 Vanilla), Tailwind CSS v3 |
 | **Database** | Supabase (PostgreSQL) |
 | **Auth & Security** | Supabase Auth + Row Level Security (RLS) |
-| **Tipografi** | Google Fonts — Playfair Display & Inter |
+| **Typography** | Google Fonts — Playfair Display & Inter |
 
 ---
 
-## 🗄️ Skema Database
+## 🗄️ Database Schema
 
-Blossom mengaktifkan **Row Level Security** di setiap tabel untuk melindungi data pengguna di sisi server.
+Blossom enables **Row Level Security** on each table to protect user data on the server side.
 
-| Tabel | Kolom Utama | Aturan RLS |
+| Table | Main Columns | RLS Rule |
 |---|---|---|
-| `profiles` | `id`, `full_name`, `is_admin` | Pengguna hanya bisa baca & ubah profil milik sendiri |
-| `products` | `id`, `name`, `price`, `discount_percent` | Read: publik — Write: khusus admin |
-| `wishlists` | `id`, `user_id`, `product_id` | Hanya pemilik yang bisa akses |
-| `carts` | `id`, `user_id`, `product_id`, `quantity` | Hanya pemilik yang bisa akses |
+| `profiles` | `id`, `full_name`, `is_admin` | Users can only read and update their own profile |
+| `products` | `id`, `name`, `price`, `discount_percent` | Read: public — Write: admin-only |
+| `wishlists` | `id`, `user_id`, `product_id` | Only the owner can access |
+| `carts` | `id`, `user_id`, `product_id`, `quantity` | Only the owner can access |
 
 ---
 
-## 🔒 Lisensi
+## 🔒 License
 
-Didistribusikan di bawah **Lisensi MIT**. Lihat berkas `LICENSE` untuk detail penggunaan komersial dan distribusi kode.
+Distributed under the **MIT License**. See the `LICENSE` file for details on commercial use and code distribution.
 
 ---
 
 <div align="center">
 
-Dikembangkan dengan penuh dedikasi untuk menyajikan kemewahan visual mode dan keandalan sistem full-stack real-time. 🌸
+Developed with dedication to deliver visual luxury and dependable real-time full-stack performance. 🌸
 
 </div>
